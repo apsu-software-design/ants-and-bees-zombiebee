@@ -1,8 +1,16 @@
 import {AntGame, AntColony, Place, Hive} from './game';
 import {Ant, EaterAnt, GuardAnt} from './ants';
-
+/**
+ * Vorpal is a library for a command-line interface.
+ */
 import vorpal = require('vorpal');
+/**
+ * Chalk is a library for an Application Programming Interface.
+ */
 import chalk = require('chalk');
+/**
+ * Lodash is a utility library for increasing modularity.
+ */
 import _ = require('lodash');
 
 /**
@@ -14,6 +22,11 @@ export function showMapOf(game:AntGame){
   console.log(getMap(game));
 }
 
+/**
+ * Creates and displays a map for the game.
+ * @param game the AntGame 
+ * @returns the map of the game
+ */
 function getMap(game:AntGame) {
   let places:Place[][] = game.getPlaces();
   let tunnelLength = places[0].length;
@@ -25,6 +38,9 @@ function getMap(game:AntGame) {
   map += `Turn: ${game.getTurn()}, Food: ${game.getFood()}, Boosts available: [${game.getBoostNames()}]\n`;
   map += '     '+_.range(0,tunnelLength).join('    ')+'      Hive'+'\n';
    
+  /**
+   * Loop for adding all symbols to the map.
+   */
   for(let i=0; i<places.length; i++){
     map += '    '+Array(tunnelLength+1).join('=====');
     
@@ -39,7 +55,9 @@ function getMap(game:AntGame) {
     map += '\n';
 
     map += i+')  ';
-      
+    /**
+     * Loop for adding the symbols for ants and bees to the map.
+     */  
     for(let j=0; j<places[i].length; j++){ 
       let place:Place = places[i][j];
 
@@ -55,6 +73,9 @@ function getMap(game:AntGame) {
       map += ' '; 
     }
     map += '\n    ';
+    /**
+     * Loop for adding the symbols for water and dirt on the map.
+     */
     for(let j=0; j<places[i].length; j++){
       let place = places[i][j];
       if(place.isWater()){
@@ -70,7 +91,11 @@ function getMap(game:AntGame) {
   return map;
 }
 
-
+/**
+ * Creates icons for each type of ant.
+ * @param ant ant to be shown
+ * @returns the icon that represents the ant
+ */
 function iconFor(ant:Ant){
   if(ant === undefined){ return ' ' };
   let icon:string;
@@ -100,7 +125,11 @@ function iconFor(ant:Ant){
   return icon;
 }
 
-
+/**
+ * Function for actually playing the game
+ * (interacting with player).
+ * @param game the AntGame being played
+ */
 export function play(game:AntGame) {
   Vorpal
     .delimiter(chalk.green('AvB $'))

@@ -1,5 +1,8 @@
 import {Insect, Bee, Ant, GrowerAnt, ThrowerAnt, EaterAnt, ScubaAnt, GuardAnt} from './ants';
 
+/**
+ * The place class, which represents locations in the game.
+ */
 class Place {
   protected ant:Ant;
   protected guard:GuardAnt;
@@ -29,6 +32,12 @@ class Place {
 
   getBees():Bee[] { return this.bees; }
 
+  /**
+   * Gets the closest bee in the Place.
+   * @param maxDistance the max distance for the range of where the bee can be
+   * @param minDistance the min distance for the range of where the bee can be
+   * @returns the closest bee or undefined
+   */
   getClosestBee(maxDistance:number, minDistance:number = 0):Bee {
 		let p:Place = this;
 		for(let dist = 0; p!==undefined && dist <= maxDistance; dist++) {
@@ -40,6 +49,11 @@ class Place {
 		return undefined;
   }
 
+  /**
+   * Adds an ant to the Place.
+   * @param ant the ant to be placed
+   * @returns true if an Ant was added successfully and false if the Ant could not be added
+   */
   addAnt(ant:Ant):boolean {
     if(ant instanceof GuardAnt) {
       if(this.guard === undefined){
@@ -57,6 +71,10 @@ class Place {
     return false;
   }
 
+  /**
+   * Removes an ant.
+   * @returns either a guard ant or regular ant depending on which was removed
+   */
   removeAnt():Ant {
     if(this.guard !== undefined){
       let guard = this.guard;
@@ -70,11 +88,19 @@ class Place {
     }
   }
 
+  /**
+   * Adds a bee to the Place.
+   * @param bee the bee bee-ing added
+   */
   addBee(bee:Bee):void {
     this.bees.push(bee);
     bee.setPlace(this);
   }
 
+  /**
+   * Removes a bee from the Place.
+   * @param bee the bee bee-ing removed
+   */
   removeBee(bee:Bee):void {
     var index = this.bees.indexOf(bee);
     if(index >= 0){
@@ -83,16 +109,27 @@ class Place {
     }
   }
 
+  /**
+   * Removes all bees from the Place.
+   */
   removeAllBees():void {
     this.bees.forEach((bee) => bee.setPlace(undefined) );
     this.bees = [];
   }
 
+  /**
+   * The bee exits the Place.
+   * @param bee bee exiting
+   */
   exitBee(bee:Bee):void {
     this.removeBee(bee);
     this.exit.addBee(bee);  
   }
 
+  /**
+   * Removes an insect from the Place.
+   * @param insect insect getting removed
+   */
   removeInsect(insect:Insect) {
     if(insect instanceof Ant){
       this.removeAnt();
@@ -102,6 +139,9 @@ class Place {
     }
   }
 
+  /**
+   * The ants are washed away by the water.
+   */
   act() {
     if(this.water){
       if(this.guard){
@@ -114,7 +154,9 @@ class Place {
   }
 }
 
-
+/**
+ * The Hive represents the bees' home.
+ */
 class Hive extends Place {
   private waves:{[index:number]:Bee[]} = {}
 
@@ -122,6 +164,12 @@ class Hive extends Place {
     super('Hive');
   }
 
+  /**
+   * Creates a wave of bees.
+   * @param attackTurn the turn the wave will be deployed
+   * @param numBees the amount of bees to include in the wave
+   * @returns the hive
+   */
   addWave(attackTurn:number, numBees:number):Hive {
     let wave:Bee[] = [];
     for(let i=0; i<numBees; i++) {
@@ -133,6 +181,12 @@ class Hive extends Place {
     return this;
   }
   
+  /**
+   * A wave of bees invade the colony.
+   * @param colony Ant colony being invaded
+   * @param currentTurn number indicating the current turn of the game
+   * @returns the array of bees for the current wave
+   */
   invade(colony:AntColony, currentTurn:number): Bee[]{
     if(this.waves[currentTurn] !== undefined) {
       this.waves[currentTurn].forEach((bee) => {
@@ -149,7 +203,9 @@ class Hive extends Place {
   }
 }
 
-
+/**
+ * The AntColony represents the ants' home.
+ */
 class AntColony {
   private food:number;
   private places:Place[][] = [];
@@ -204,6 +260,13 @@ class AntColony {
     console.log('Found a '+boost+'!');
   }
 
+  /**
+   * Used to deploy an ant to a place.
+   * @param ant ant to be deployed
+   * @param place place ant is deployed to
+   * @returns a string explaining why the action was unsuccessful
+   * or undefined if successful
+   */
   deployAnt(ant:Ant, place:Place):string {
     if(this.food >= ant.getFoodCost()){
       let success = place.addAnt(ant);
@@ -220,6 +283,13 @@ class AntColony {
     place.removeAnt();
   }
 
+  /**
+   * Used to apply a boost.
+   * @param boost the boost to be applied
+   * @param place the place the boost is being used
+   * @returns a string explaining why the action was unsuccessful
+   * or undefined if successful
+   */
   applyBoost(boost:string, place:Place):string {
     if(this.boosts[boost] === undefined || this.boosts[boost] < 1) {
       return 'no such boost';
@@ -232,6 +302,9 @@ class AntColony {
     return undefined;
   }
 
+  /**
+   * Causes all currently deployed ants to act out their turns.
+   */
   antsAct() {
     this.getAllAnts().forEach((ant) => {
       if(ant instanceof GuardAnt) {
@@ -243,12 +316,19 @@ class AntColony {
     });    
   }
 
+  /**
+   * Causes all bees in the colony to act out their turns.
+   */
   beesAct() {
     this.getAllBees().forEach((bee) => {
       bee.act();
     });
   }
 
+  /**
+   * Causes every place in the colony to act out their turns
+   * (this is where environmental effects occur).
+   */
   placesAct() {
     for(let i=0; i<this.places.length; i++) {
       for(let j=0; j<this.places[i].length; j++) {
@@ -257,6 +337,10 @@ class AntColony {
     }    
   }
 
+  /**
+   * Gets all ants that are currently deployed.
+   * @returns ants - the array of ants that are deployed
+   */
   getAllAnts():Ant[] {
     let ants = [];
     for(let i=0; i<this.places.length; i++) {
@@ -269,6 +353,10 @@ class AntColony {
     return ants;
   }
 
+  /**
+   * Gets all bees in the ant colony.
+   * @returns bees - the array of bees in the colony
+   */
   getAllBees():Bee[] {
     var bees = [];
     for(var i=0; i<this.places.length; i++){
@@ -280,11 +368,16 @@ class AntColony {
   }
 }
 
-
+/**
+ * The AntGame represents where most of the actual game interaction occurs.
+ */
 class AntGame {
   private turn:number = 0;
   constructor(private colony:AntColony, private hive:Hive){}
 
+  /**
+   * Function for causing a turn of the game to occur.
+   */
   takeTurn() {
     console.log('');
     this.colony.antsAct();
@@ -297,6 +390,11 @@ class AntGame {
 
   getTurn() { return this.turn; }
 
+  /**
+   * Determines if the game has been won, lost, or continues.
+   * @returns boolean or undefined - false if bees have reached the queen, true if there are
+   * no more bees to attack the colony, and undefined otherwise
+   */
   gameIsWon():boolean|undefined {
     if(this.colony.queenHasBees()){
       return false;
@@ -307,6 +405,13 @@ class AntGame {
     return undefined;
   }
 
+/**
+ * Deploys an ant to a selected place.
+ * @param antType type of ant to be deployed
+ * @param placeCoordinates coordinates of the place an ant is deployed to
+ * @returns undefined if successful or a string explaining why the deployment
+ * was unsuccessful if unsuccessful
+ */
   deployAnt(antType:string, placeCoordinates:string):string {
     let ant;
     switch(antType.toLowerCase()) {
@@ -333,6 +438,12 @@ class AntGame {
     }
   }
 
+  /**
+   * Used to remove an ant from a place.
+   * @param placeCoordinates coordinates of the ant to be removed
+   * @returns undefined if successful or a string explaining why the action
+   * was unsuccessful
+   */
   removeAnt(placeCoordinates:string):string {
     try {
       let coords = placeCoordinates.split(',');
@@ -344,6 +455,12 @@ class AntGame {
     }    
   }
 
+  /**
+   * Used to apply a boost.
+   * @param boostType type of boost being used
+   * @param placeCoordinates coordinates of the insect using the boost
+   * @returns undefined if successful or a string explaining why the action was unsuccessful
+   */
   boostAnt(boostType:string, placeCoordinates:string):string {
     try {
       let coords = placeCoordinates.split(',');

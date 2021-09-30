@@ -2,7 +2,9 @@ import * as Ants from './ants';
 import {AntColony, AntGame, Hive} from './game';
 import {play, showMapOf} from './ui';
 
-
+/**
+ * This file is for testing the code and starting the game.
+ */
 if(process.argv[2] === '--debug'){ 
   //the scenario to debug with
   var colony = new AntColony(16,1,8,0); //testing colony
