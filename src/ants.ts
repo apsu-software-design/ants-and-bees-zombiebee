@@ -1,5 +1,8 @@
 import {AntColony, Place} from './game';
 
+/**
+ * The insect class, which represents the moving pieces of the game.
+ */
 export abstract class Insect {
   readonly name:string;
 
@@ -10,6 +13,11 @@ export abstract class Insect {
   getPlace() { return this.place; }
   setPlace(place:Place){ this.place = place; }
 
+    /**
+     * This function reduces the amount of armor of an insect.
+     * @param amount the amount of durability the armor is losing
+     * @returns true or false depending on if the insect has perished 
+     */
   reduceArmor(amount:number):boolean {
     this.armor -= amount;
     if(this.armor <= 0){
@@ -27,7 +35,9 @@ export abstract class Insect {
   }
 }
 
-
+/**
+ * The Bee class, extends the Insect class.
+ */
 export class Bee extends Insect {
   readonly name:string = 'Bee';
   private status:string;
@@ -47,6 +57,9 @@ export class Bee extends Insect {
 
   setStatus(status:string) { this.status = status; }
 
+    /**
+     * If uninhibited, the bee stings an ant or continues moving through the colony. 
+     */
   act() {
     if(this.isBlocked()){
       if(this.status !== 'cold') {
@@ -62,7 +75,9 @@ export class Bee extends Insect {
   }
 }
 
-
+/**
+ * The Ant class, extends the Insect class.
+ */
 export abstract class Ant extends Insect {
   protected boost:string;
   constructor(armor:number, private foodCost:number = 0, place?:Place) {
@@ -76,13 +91,19 @@ export abstract class Ant extends Insect {
   }
 }
 
-
+/**
+ * The GrowerAnt class, which grows food and finds boosts for the colony.
+ */
 export class GrowerAnt extends Ant {
   readonly name:string = "Grower";
   constructor() {
     super(1,1)
   }
 
+    /**
+     * The Grower Ant grows food or boosts for the colony.
+     * @param colony the ant colony
+     */
   act(colony:AntColony) {
     let roll = Math.random();
     if(roll < 0.6){
@@ -99,7 +120,9 @@ export class GrowerAnt extends Ant {
   }  
 }
 
-
+/**
+ * The ThrowerAnt class, which throws leaves at bees.
+ */
 export class ThrowerAnt extends Ant {
   readonly name:string = "Thrower";
   private damage:number = 1;
@@ -108,6 +131,9 @@ export class ThrowerAnt extends Ant {
     super(1,4);
   }
 
+    /**
+     * The Thrower Ant throws a leaf or uses its boost.
+     */
   act() {
     if(this.boost !== 'BugSpray'){
       let target;
@@ -143,7 +169,9 @@ export class ThrowerAnt extends Ant {
   }
 }
 
-
+/**
+ * The EaterAnt class, which can eat bees.
+ */
 export class EaterAnt extends Ant {
   readonly name:string = "Eater";
   private turnsEating:number = 0;
@@ -156,6 +184,9 @@ export class EaterAnt extends Ant {
     return this.stomach.getBees().length > 0;
   }
 
+  /**
+   * The Eater Ant eats, continues to eat, or finishes digesting a bee. (yum)
+   */
   act() {
     console.log("eating: "+this.turnsEating);
     if(this.turnsEating == 0){
@@ -177,6 +208,12 @@ export class EaterAnt extends Ant {
     }
   }  
 
+  /**
+   * The Eater Ant loses armor durability and, if the bee it was digesting 
+   * was just beginning to be digested or the ant perishes, the ant coughs up the bee.
+   * @param amount the amount of durability the armor is losing
+   * @returns true or false depending on if the ant perishes
+   */
   reduceArmor(amount:number):boolean {
     this.armor -= amount;
     console.log('armor reduced to: '+this.armor);
@@ -202,7 +239,9 @@ export class EaterAnt extends Ant {
   }
 }
 
-
+/**
+ * The ScubaAnt class, which can swim in water-filled tunnels.
+ */
 export class ScubaAnt extends Ant {
   readonly name:string = "Scuba";
   private damage:number = 1;
@@ -211,6 +250,9 @@ export class ScubaAnt extends Ant {
     super(1,5)
   }
 
+  /**
+   * The Scuba Ant throws a leaf or uses its boost.
+   */
   act() {
     if(this.boost !== 'BugSpray'){
       let target;
@@ -246,7 +288,9 @@ export class ScubaAnt extends Ant {
   }
 }
 
-
+/**
+ * The GuardAnt class, which guards fellow ants.
+ */
 export class GuardAnt extends Ant {
   readonly name:string = "Guard";
 

@@ -7,14 +7,17 @@
     "start": "node build/index.js",
     "test": "node build/index.js --debug"
   },
-  "author": "YOUR NAME HERE",
+  "author": "Lily Thompson",
   "license": "ISC",
   "dependencies": {
+    "flag": "^4.4.0",
     "lodash": "^4.17.4",
     "vorpal": "^1.11.4"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.50",
-    "@types/node": "^7.0.0"
+    "@types/node": "^7.0.0",
+    "none": "^1.0.0",
+    "typedoc": "^0.22.4"
   }
 }
